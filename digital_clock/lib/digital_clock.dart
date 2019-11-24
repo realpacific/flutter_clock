@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:digital_clock/clock_hand.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -30,25 +31,6 @@ final _darkTheme = {
   _Element.shadow: Color(0xFF174EA6),
 };
 
-class ClockHand {
-  final List<int> values;
-  final ScrollController controller;
-  int currentIndex = 0;
-  int maxRepitition = 10;
-  final DateFormat dateFormat;
-
-  ClockHand(this.values, this.controller, this.dateFormat);
-
-  calculateIndex(DateTime dateTime) {
-    final format = dateFormat.format(dateTime);
-//    if (currentIndex < values.length * (maxRepitition - 2)) {
-//      return (values.length + values.indexOf(int.parse(format))) *
-//          (currentIndex / values.length).ceil();
-//    }
-    return values.length + values.indexOf(int.parse(format));
-  }
-}
-
 class DigitalClock extends StatefulWidget {
   const DigitalClock(this.model);
 
@@ -62,20 +44,15 @@ class _DigitalClockState extends State<DigitalClock> {
   DateTime _dateTime = DateTime.now();
   Timer _timer;
 
-  static final hours = new List<int>.generate(12, (int index) => index + 1);
-  static final minutes = new List<int>.generate(60, (int index) => index);
-  static final seconds = new List<int>.generate(60, (int index) => index);
   static final ScrollController _hoursController =
-      new ScrollController(initialScrollOffset: 0.0);
+      ScrollController(initialScrollOffset: 0.0);
   static final ScrollController _minutesController =
-      new ScrollController(initialScrollOffset: 0.0);
+      ScrollController(initialScrollOffset: 0.0);
   static final ScrollController _secondController =
-      new ScrollController(initialScrollOffset: 0.0);
-  ClockHand hourHand = ClockHand(hours, _hoursController, DateFormat("hh"));
-  ClockHand minuteHand =
-      ClockHand(minutes, _minutesController, DateFormat("mm"));
-  ClockHand secondHand =
-      ClockHand(seconds, _secondController, DateFormat("ss"));
+      ScrollController(initialScrollOffset: 0.0);
+  ClockHand hourHand = HourClockHand(_hoursController);
+  ClockHand minuteHand = MinuteClockHand(_minutesController);
+  ClockHand secondHand = SecondClockHand(_secondController);
 
   @override
   void initState() {
@@ -99,6 +76,9 @@ class _DigitalClockState extends State<DigitalClock> {
     _timer?.cancel();
     widget.model.removeListener(_updateModel);
     widget.model.dispose();
+    hourHand.controller.dispose();
+    minuteHand.controller.dispose();
+    secondHand.controller.dispose();
     super.dispose();
   }
 
@@ -112,16 +92,11 @@ class _DigitalClockState extends State<DigitalClock> {
     var indexOfMinutes = minuteHand.calculateIndex(_dateTime);
     var indexOfSeconds = secondHand.calculateIndex(_dateTime);
     var indexOfHours = hourHand.calculateIndex(_dateTime);
-    print((indexOfHours - 12).toString() +
-        ":" +
-        (indexOfMinutes - 60).toString() +
-        ":" +
-        (indexOfSeconds - 60).toString());
     if (secondHand.controller.hasClients) {
       secondHand.controller.animateTo(
         (indexOfSeconds - OFFSET) * (90.0),
         curve: Curves.linear,
-        duration: const Duration(milliseconds: 600),
+        duration: const Duration(milliseconds: 200),
       );
     }
     if (hourHand.controller.hasClients) {
@@ -164,72 +139,10 @@ class _DigitalClockState extends State<DigitalClock> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Expanded(
-                  child: ListView.separated(
-                      separatorBuilder: (BuildContext context, int index) {
-                        return Divider();
-                      },
-                      controller: hourHand.controller,
-                      itemCount:
-                          hourHand.values.length * hourHand.maxRepitition,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (BuildContext context, int index) {
-                        hourHand.currentIndex = index;
-                        return Container(
-                          width: 90,
-                          child: Center(
-                            child: Text(
-                              '${(index + 1) % 12}',
-                              style: TextStyle(fontSize: 60),
-                            ),
-                          ),
-                        );
-                      })),
-              Expanded(
-                  child: ListView.separated(
-                      separatorBuilder: (BuildContext context, int index) {
-                        return Divider();
-                      },
-                      controller: minuteHand.controller,
-                      itemCount:
-                          minuteHand.values.length * minuteHand.maxRepitition,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (BuildContext context, int index) {
-                        minuteHand.currentIndex = index;
-                        return Container(
-                          height: 50,
-                          width: 90,
-                          child: Center(
-                            child: Text(
-                              '${index % 60}',
-                              style: TextStyle(fontSize: 50),
-                            ),
-                          ),
-                        );
-                      })),
-              Expanded(
-                  child: ListView.separated(
-                      separatorBuilder: (BuildContext context, int index) {
-                        return Divider();
-                      },
-                      controller: secondHand.controller,
-                      itemCount:
-                          secondHand.values.length * secondHand.maxRepitition,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (BuildContext context, int index) {
-                        secondHand.currentIndex = index;
-                        print(index.toString() + " index secs");
-                        return Container(
-                          height: 50,
-                          width: 90,
-                          child: Center(
-                            child: Text(
-                              '${index % 60}',
-                              style: TextStyle(fontSize: 30),
-                            ),
-                          ),
-                        );
-                      })),
+              Text(DateFormat("HH:mm:ss").format(_dateTime).toString()),
+              Expanded(child: buildHand(hourHand)),
+              Expanded(child: buildHand(minuteHand)),
+              Expanded(child: buildHand(secondHand)),
             ],
           ),
         ),

@@ -1,0 +1,11 @@
+[33meb7afa5[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #4 from flutter/flutter_clock_upload
+[33m98e3186[m Add .gitignore to digital ios
+[33mebb0e40[m Add .gitignore to digital android
+[33me5b8d8a[m Add .files to digital
+[33m1425f85[m Add .gitignore to analog android
+[33m3b891f4[m Add .gitignore to analog ios
+[33m11ad5dc[m Add .files for analog_clock
+[33m0e8f89b[m Add flutter_clock_helper .metadata
+[33mb0dde23[m Copy Flutter Clock code
+[33m416e23b[m Copy Flutter Clock code
+[33m69d9b95[m Initial commit
