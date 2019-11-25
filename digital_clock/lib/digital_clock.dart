@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:digital_clock/arc_clipper.dart';
 import 'package:digital_clock/clock_hand.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +18,8 @@ enum _Element {
   shadow,
 }
 
-const OFFSET = 2;
-
+const OFFSET = 1;
+const WIDTH = 90.0;
 final _lightTheme = {
   _Element.background: Color(0xFF81B3FE),
   _Element.text: Colors.white,
@@ -43,6 +44,12 @@ class DigitalClock extends StatefulWidget {
 class _DigitalClockState extends State<DigitalClock> {
   DateTime _dateTime = DateTime.now();
   Timer _timer;
+  var _temperature = '';
+  var _temperatureRange = '';
+  var _condition = '';
+  var _location = '';
+  var isPortrait = true;
+  var offset = OFFSET;
 
   static final ScrollController _hoursController =
       ScrollController(initialScrollOffset: 0.0);
@@ -84,7 +91,10 @@ class _DigitalClockState extends State<DigitalClock> {
 
   void _updateModel() {
     setState(() {
-      // Cause the clock to rebuild when the model changes.
+      _temperature = widget.model.temperatureString;
+      _temperatureRange = '(${widget.model.low} - ${widget.model.highString})';
+      _condition = widget.model.weatherString;
+      _location = widget.model.location;
     });
   }
 
@@ -94,21 +104,21 @@ class _DigitalClockState extends State<DigitalClock> {
     var indexOfHours = hourHand.calculateIndex(_dateTime);
     if (secondHand.controller.hasClients) {
       secondHand.controller.animateTo(
-        (indexOfSeconds - OFFSET) * (90.0),
+        (indexOfSeconds - offset) * (WIDTH),
         curve: Curves.linear,
         duration: const Duration(milliseconds: 200),
       );
     }
     if (hourHand.controller.hasClients) {
       hourHand.controller.animateTo(
-        (indexOfHours - OFFSET) * 90.0,
+        (indexOfHours - offset) * WIDTH,
         curve: Curves.easeOut,
         duration: const Duration(milliseconds: 1000),
       );
     }
     if (minuteHand.controller.hasClients) {
       minuteHand.controller.animateTo(
-        (indexOfMinutes - OFFSET) * (90.0),
+        (indexOfMinutes - offset) * (WIDTH),
         curve: Curves.easeOut,
         duration: const Duration(milliseconds: 1000),
       );
@@ -124,43 +134,87 @@ class _DigitalClockState extends State<DigitalClock> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    setState(() {
+      if (MediaQuery.of(context).orientation == Orientation.portrait) {
+        offset = OFFSET;
+      } else {
+        offset = 3;
+      }
+    });
+
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-        Container(
-          margin: EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.black,
-              width: 3.0,
-            ),
-          ),
+        Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Text(DateFormat("HH:mm:ss").format(_dateTime).toString()),
-              Expanded(child: buildHand(hourHand)),
-              Expanded(child: buildHand(minuteHand)),
-              Expanded(child: buildHand(secondHand)),
+              Text(
+                _temperature,
+                style: TextStyle(
+                    fontSize: 60.0,
+                    fontFamily: 'Segment7Standard',
+                    color: Color.fromARGB(255, 0, 255, 0)),
+              ),
+              Text(_temperatureRange),
+              Text(_condition),
+              Text(_location),
             ],
           ),
         ),
-        Positioned(
-          top: 2.0,
-          bottom: 2.0,
-          width: 90,
-          left: (90.0 + 4) * OFFSET,
-          child: Container(
-            width: 96.0,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.red,
-                width: 2.0,
+        Flexible(
+          flex: 1,
+          child: Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              ClipPath(
+                clipBehavior: Clip.antiAlias,
+                clipper: ArcClipper(),
+                child: Container(
+                  decoration: new BoxDecoration(
+                    gradient: new LinearGradient(
+                        colors: [Colors.red, Colors.cyan],
+                        begin: Alignment.centerRight,
+                        end: Alignment.centerLeft),
+                  ),
+                  child: SizedBox(
+                    width: 180,
+                    height: 180,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Text(DateFormat("HH:mm:ss")
+                            .format(_dateTime)
+                            .toString()),
+                        Expanded(child: buildHand(hourHand)),
+                        Expanded(child: buildHand(minuteHand)),
+                        Expanded(child: buildHand(secondHand)),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
+              Positioned(
+                top: 5.0,
+                bottom: 5.0,
+                width: 90,
+                left: (WIDTH) * offset,
+                child: Container(
+                  width: 96.0,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color.fromARGB(255, 0, 255, 0),
+                      width: 4.0,
+                    ),
+                  ),
+                ),
+              )
+            ],
           ),
-        )
+        ),
       ],
     );
   }

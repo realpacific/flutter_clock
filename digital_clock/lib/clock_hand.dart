@@ -74,7 +74,8 @@ Widget buildHand(ClockHand hand) {
           child: Center(
             child: Text(
               '${(currentTime <= 9) ? '0' + currentTime.toString() : currentTime}',
-              style: TextStyle(fontSize: 30),
+              style: TextStyle(fontSize: 30.0, fontFamily: 'Segment7Standard'),
+
             ),
           ),
         );

@@ -19,6 +19,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   fonts:
-    - family: PressStart2P
+    - family: Segment7Standard
       fonts:
-        - asset: third_party/PressStart2P-Regular.ttf
+        - asset: assets/Segment7Standard.otf
