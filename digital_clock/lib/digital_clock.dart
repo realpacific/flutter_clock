@@ -18,7 +18,7 @@ enum _Element {
   shadow,
 }
 
-const OFFSET = 1;
+const OFFSET = 3;
 const WIDTH = 90.0;
 final _lightTheme = {
   _Element.background: Color(0xFF81B3FE),
@@ -138,63 +138,38 @@ class _DigitalClockState extends State<DigitalClock> {
       if (MediaQuery.of(context).orientation == Orientation.portrait) {
         offset = OFFSET;
       } else {
-        offset = 3;
+        offset = 4;
       }
     });
 
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        Center(
-          child: Column(
-            children: <Widget>[
-              Text(
-                _temperature,
-                style: TextStyle(
-                    fontSize: 60.0,
-                    fontFamily: 'Segment7Standard',
-                    color: Color.fromARGB(255, 0, 255, 0)),
-              ),
-              Text(_temperatureRange),
-              Text(_condition),
-              Text(_location),
-            ],
-          ),
-        ),
-        Flexible(
-          flex: 1,
-          child: Stack(
+    return Container(
+      decoration: new BoxDecoration(
+        gradient: new LinearGradient(
+            colors: [Colors.red, Colors.purpleAccent],
+            begin: Alignment.centerRight,
+            end: Alignment.centerLeft),
+      ),
+      child: Stack(
+        children: <Widget>[
+          Stack(
             fit: StackFit.expand,
             children: <Widget>[
-              ClipPath(
-                clipBehavior: Clip.antiAlias,
-                clipper: ArcClipper(),
-                child: Container(
-                  decoration: new BoxDecoration(
-                    gradient: new LinearGradient(
-                        colors: [Colors.red, Colors.cyan],
-                        begin: Alignment.centerRight,
-                        end: Alignment.centerLeft),
-                  ),
-                  child: SizedBox(
-                    width: 180,
-                    height: 180,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Text(DateFormat("HH:mm:ss")
+              Container(
+                color: Colors.transparent,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Align(
+                        alignment: Alignment.topRight,
+                        child: Text(DateFormat("HH:mm:ss")
                             .format(_dateTime)
-                            .toString()),
-                        Expanded(child: buildHand(hourHand)),
-                        Expanded(child: buildHand(minuteHand)),
-                        Expanded(child: buildHand(secondHand)),
-                      ],
-                    ),
-                  ),
+                            .toString())),
+                    Expanded(child: buildHand(hourHand)),
+                    Expanded(child: buildHand(minuteHand)),
+                    Expanded(child: buildHand(secondHand)),
+                  ],
                 ),
               ),
               Positioned(
@@ -206,16 +181,51 @@ class _DigitalClockState extends State<DigitalClock> {
                   width: 96.0,
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(255, 0, 255, 0),
-                      width: 4.0,
+                      color: Colors.blueAccent,
+                      width: 3.0,
                     ),
                   ),
                 ),
               )
             ],
           ),
-        ),
-      ],
+          ClipPath(
+            clipBehavior: Clip.antiAlias,
+            clipper: ArcClipper(),
+            child: SizedBox(
+              width: 250.0,
+              child: Card(
+                margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
+                elevation: 90.0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    image: new DecorationImage(
+                      image: new AssetImage(
+                          'assets/joonas-sild-CwnDbpkSdYI-unsplash.webp'),
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        _temperature,
+                        style: TextStyle(
+                            fontSize: 50.0, fontFamily: 'Segment7Standard'),
+                      ),
+                      Text(_temperatureRange),
+                      Text(_condition),
+                      Text(_location),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

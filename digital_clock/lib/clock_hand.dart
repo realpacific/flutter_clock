@@ -7,6 +7,7 @@ abstract class ClockHand {
   int _counter = 1;
   int _duplicationCount = 5;
   final DateFormat dateFormat;
+  int _previousValue = 0;
 
   ClockHand(this.values, this.controller, this.dateFormat);
 
@@ -17,15 +18,20 @@ abstract class ClockHand {
     final handTime = int.parse(format);
     final indexInValuesList = values.indexOf(handTime);
     final newPosition = indexInValuesList + values.length * _counter;
+    if (_previousValue == handTime) {
+      _previousValue = handTime;
+      return newPosition;
+    }
+    _previousValue = handTime;
     // If the current hand time value is equal to the max possible value of the hand i.e the last element of [values], then switch to new iteration;
     if (handTime == values.last) {
       _counter++;
       print("At last: Counter:" + _counter.toString());
     }
-    // Reset the [_counter] as there is only one duplication of the hand values remaining, hence save one set of hand values to the right
+    // Reset the [_counter] since there is only one set of the hand values remaining, and we have to leave one set of hand values to the right
     if (_counter == _duplicationCount) {
       print("Resetting: Counter:" + _counter.toString());
-      // Reset to 1 so as to offset the list and save one unexplored set of hand values on the left
+      // Reset to 1 so as to offset the list and leave one unexplored set of hand values on the left
       _counter = 1;
       // Jump to the 2nd set of hand values
       return indexInValuesList + values.length * _counter;
@@ -74,8 +80,7 @@ Widget buildHand(ClockHand hand) {
           child: Center(
             child: Text(
               '${(currentTime <= 9) ? '0' + currentTime.toString() : currentTime}',
-              style: TextStyle(fontSize: 30.0, fontFamily: 'Segment7Standard'),
-
+              style: TextStyle(fontSize: 50.0, fontFamily: 'Segment7Standard'),
             ),
           ),
         );
