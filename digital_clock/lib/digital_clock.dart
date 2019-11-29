@@ -157,7 +157,6 @@ class _DigitalClockState extends State<DigitalClock> {
         offset = 4;
       }
     });
-
     return Container(
       decoration: new BoxDecoration(
         gradient: new LinearGradient(
@@ -167,77 +166,84 @@ class _DigitalClockState extends State<DigitalClock> {
       ),
       child: Stack(
         children: <Widget>[
-          Stack(
-            fit: StackFit.expand,
+          _buildTimeDisplayHolder(),
+          _buildWeatherStatusHolder(),
+        ],
+      ),
+    );
+  }
+
+  Stack _buildTimeDisplayHolder() {
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        Container(
+          color: Colors.transparent,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Container(
-                color: Colors.transparent,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Align(
-                        alignment: Alignment.topRight,
-                        child: Text(_dateTime.toString())),
-                    Expanded(child: buildHand(hourHand)),
-                    Expanded(child: buildHand(minuteHand)),
-                    Expanded(child: buildHand(secondHand, fontSize: 40.0)),
-                  ],
-                ),
-              ),
-              _buildMarker()
+              Align(
+                  alignment: Alignment.topRight,
+                  child: Text(_dateTime.toString())),
+              Expanded(child: buildHand(hourHand)),
+              Expanded(child: buildHand(minuteHand)),
+              Expanded(child: buildHand(secondHand, fontSize: 40.0)),
             ],
           ),
-          ClipPath(
-            clipBehavior: Clip.antiAlias,
-            clipper: ArcClipper(),
-            child: SizedBox(
-              width: 300.0,
-              child: Card(
-                shape: ContinuousRectangleBorder(),
-                borderOnForeground: true,
-                color: Colors.grey,
-                elevation: 40.0,
-                margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
-                child: Stack(
-                  children: <Widget>[
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        image: new DecorationImage(
-                          image: new AssetImage(
-                              'assets/undraw_a_day_at_the_park.png'),
-                          fit: BoxFit.fitHeight,
-                        ),
-                      ),
-                    ),
-                    buildOverlay(),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12.0, vertical: 24.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            _temperature,
-                            style:
-                                TextStyle(fontSize: 50.0, fontFamily: 'Varela'),
-                          ),
-                          Text(_temperatureRange),
-                          Text(_condition),
-                          Text(_location),
-                        ],
-                      ),
-                    )
-                  ],
+        ),
+        _buildMarker()
+      ],
+    );
+  }
+
+  Widget _buildWeatherStatusHolder() {
+    return ClipPath(
+      clipBehavior: Clip.antiAlias,
+      clipper: ArcClipper(),
+      child: SizedBox(
+        width: 300.0,
+        child: Card(
+          shape: ContinuousRectangleBorder(),
+          borderOnForeground: true,
+          color: Colors.grey,
+          elevation: 40.0,
+          margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
+          child: Stack(
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  image: new DecorationImage(
+                    image:
+                    new AssetImage('assets/undraw_a_day_at_the_park.png'),
+                    fit: BoxFit.fitHeight,
+                  ),
                 ),
               ),
-            ),
+              buildOverlay(),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12.0, vertical: 24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      _temperature,
+                      style: TextStyle(fontSize: 50.0, fontFamily: 'Varela'),
+                    ),
+                    Text(_temperatureRange),
+                    Text(_condition),
+                    Text(_location),
+                  ],
+                ),
+              )
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
