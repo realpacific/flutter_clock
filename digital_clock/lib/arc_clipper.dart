@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class ArcClipper extends CustomClipper<Path> {
+
   @override
   Path getClip(Size size) {
     Path path = Path();

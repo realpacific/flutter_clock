@@ -16,10 +16,9 @@ abstract class ClockHand {
   calculateIndex(DateTime dateTime) {
     final format = dateFormat.format(dateTime);
     final handTime = int.parse(format);
-    final indexInValuesList = values.indexOf(handTime);
-    final newPosition = indexInValuesList + values.length * _counter;
+    final indexOfCurrentHand = values.indexOf(handTime);
+    final newPosition = indexOfCurrentHand + values.length * _counter;
     if (_previousValue == handTime) {
-      _previousValue = handTime;
       return newPosition;
     }
     _previousValue = handTime;
@@ -34,7 +33,7 @@ abstract class ClockHand {
       // Reset to 1 so as to offset the list and leave one unexplored set of hand values on the left
       _counter = 1;
       // Jump to the 2nd set of hand values
-      return indexInValuesList + values.length * _counter;
+      return indexOfCurrentHand + values.length * _counter;
     }
     return newPosition;
   }
@@ -48,8 +47,16 @@ class SecondClockHand extends ClockHand {
   }
 }
 
-class HourClockHand extends ClockHand {
-  HourClockHand(ScrollController controller)
+class Hour24ClockHand extends ClockHand {
+  Hour24ClockHand(ScrollController controller)
+      : super(new List<int>.generate(24, (int index) => index + 1), controller,
+            DateFormat("HH")) {
+    _duplicationCount = 4;
+  }
+}
+
+class Hour12ClockHand extends ClockHand {
+  Hour12ClockHand(ScrollController controller)
       : super(new List<int>.generate(12, (int index) => index + 1), controller,
             DateFormat("hh")) {
     _duplicationCount = 4;
@@ -64,11 +71,12 @@ class MinuteClockHand extends ClockHand {
   }
 }
 
-Widget buildHand(ClockHand hand) {
+Widget buildHand(ClockHand hand, {fontSize: 50.0}) {
   return ListView.separated(
       separatorBuilder: (BuildContext context, int index) {
         return Divider();
       },
+      physics: NeverScrollableScrollPhysics(),
       controller: hand.controller,
       itemCount: hand.values.length * hand.duplicationCount,
       scrollDirection: Axis.horizontal,
@@ -80,7 +88,8 @@ Widget buildHand(ClockHand hand) {
           child: Center(
             child: Text(
               '${(currentTime <= 9) ? '0' + currentTime.toString() : currentTime}',
-              style: TextStyle(fontSize: 50.0, fontFamily: 'Segment7Standard'),
+              style:
+                  TextStyle(fontSize: fontSize, fontFamily: 'Segment7Standard'),
             ),
           ),
         );
