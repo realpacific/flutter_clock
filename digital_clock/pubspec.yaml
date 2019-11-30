@@ -24,6 +24,8 @@ flutter:
     - assets/sunny.png
     - assets/cloudy_day.png
     - assets/snow.png
+    - assets/windy.png
+    - assets/foggy.png
     - assets/snowing.flr
     - assets/snowfall.flr
     - assets/rainfall.flr

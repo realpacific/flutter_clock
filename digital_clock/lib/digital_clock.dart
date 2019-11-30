@@ -273,7 +273,7 @@ class _DigitalClockState extends State<DigitalClock> {
 
   Container buildOverlay() {
     return Container(
-      color: isDarkTheme() ? Colors.black54 : Colors.transparent,
+      color: isDarkTheme() ? Colors.black54 : Colors.white12,
     );
   }
 

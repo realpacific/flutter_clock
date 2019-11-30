@@ -8,7 +8,7 @@ class AssetWeatherMapper {
       case WeatherCondition.cloudy:
         return 'cloudy_day.png';
       case WeatherCondition.foggy:
-        return null;
+        return 'foggy.png';
       case WeatherCondition.rainy:
         return 'rainfall.flr';
       case WeatherCondition.snowy:
@@ -16,7 +16,7 @@ class AssetWeatherMapper {
       case WeatherCondition.thunderstorm:
         return 'thunder.flr';
       case WeatherCondition.windy:
-        return null;
+        return 'windy.png';
       default:
         return null;
     }
