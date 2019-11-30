@@ -18,6 +18,14 @@ abstract class ClockHand {
     final handTime = int.parse(format);
     final indexOfCurrentHand = values.indexOf(handTime);
     final newPosition = indexOfCurrentHand + values.length * _counter;
+    if (this.runtimeType == SecondClockHand) {
+      print("handTime:" +
+          handTime.toString() +
+          "; newPosition:" +
+          newPosition.toString() +
+          "; datetime: " +
+          dateTime.toString().substring(11));
+    }
     if (_previousValue == handTime) {
       return newPosition;
     }
@@ -28,7 +36,7 @@ abstract class ClockHand {
       print("At last: Counter:" + _counter.toString());
     }
     // Reset the [_counter] since there is only one set of the hand values remaining, and we have to leave one set of hand values to the right
-    if (_counter == _duplicationCount) {
+    if (_counter == _duplicationCount - 1) {
       print("Resetting: Counter:" + _counter.toString());
       // Reset to 1 so as to offset the list and leave one unexplored set of hand values on the left
       _counter = 1;

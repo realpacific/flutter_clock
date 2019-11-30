@@ -6,10 +6,13 @@ import 'dart:async';
 
 import 'package:digital_clock/arc_clipper.dart';
 import 'package:digital_clock/clock_hand.dart';
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_clock_helper/model.dart';
+
+import 'assets_weather_mapper.dart';
 
 enum _Element {
   background,
@@ -21,6 +24,7 @@ enum _HourFormat { hours24, hours12 }
 
 const OFFSET = 3;
 const WIDTH = 90.0;
+const WEATHER_DISPLAY_WIDTH = 300.0;
 final _lightTheme = {
   _Element.background: Color(0xFF81B3FE),
   _Element.text: Colors.white,
@@ -47,7 +51,7 @@ class _DigitalClockState extends State<DigitalClock> {
   Timer _timer;
   var _temperature = '';
   var _temperatureRange = '';
-  var _condition = '';
+  WeatherCondition _condition;
   var _location = '';
   var isPortrait = true;
   var offset = OFFSET;
@@ -100,7 +104,7 @@ class _DigitalClockState extends State<DigitalClock> {
     setState(() {
       _temperature = widget.model.temperatureString;
       _temperatureRange = '(${widget.model.low} - ${widget.model.highString})';
-      _condition = widget.model.weatherString;
+      _condition = widget.model.weatherCondition;
       _location = widget.model.location;
       if (widget.model.is24HourFormat &&
           _currentHourFormat == _HourFormat.hours12) {
@@ -120,7 +124,7 @@ class _DigitalClockState extends State<DigitalClock> {
     var indexOfHours = hourHand.calculateIndex(_dateTime);
     if (secondHand.controller.hasClients) {
       secondHand.controller.animateTo(
-        (indexOfSeconds - offset) * (WIDTH),
+        (indexOfSeconds - offset) * WIDTH,
         curve: Curves.linear,
         duration: const Duration(milliseconds: 200),
       );
@@ -160,7 +164,7 @@ class _DigitalClockState extends State<DigitalClock> {
     return Container(
       decoration: new BoxDecoration(
         gradient: new LinearGradient(
-            colors: [Color(0xff75A6A1), Color(0xff222F40)],
+            colors: [Color(0xff49637D), Color(0xff0C1725)],
             begin: Alignment.centerRight,
             end: Alignment.centerLeft),
       ),
@@ -184,9 +188,6 @@ class _DigitalClockState extends State<DigitalClock> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Align(
-                  alignment: Alignment.topRight,
-                  child: Text(_dateTime.toString())),
               Expanded(child: buildHand(hourHand)),
               Expanded(child: buildHand(minuteHand)),
               Expanded(child: buildHand(secondHand, fontSize: 40.0)),
@@ -203,7 +204,7 @@ class _DigitalClockState extends State<DigitalClock> {
       clipBehavior: Clip.antiAlias,
       clipper: ArcClipper(),
       child: SizedBox(
-        width: 300.0,
+        width: WEATHER_DISPLAY_WIDTH,
         child: Card(
           shape: ContinuousRectangleBorder(),
           borderOnForeground: true,
@@ -235,9 +236,15 @@ class _DigitalClockState extends State<DigitalClock> {
                       _temperature,
                       style: TextStyle(fontSize: 50.0, fontFamily: 'Varela'),
                     ),
-                    Text(_temperatureRange),
-                    Text(_condition),
-                    Text(_location),
+                    Text(
+                      _temperatureRange,
+                      style: TextStyle(fontSize: 15.0, fontFamily: 'Varela'),
+                    ),
+                    buildWidgetForWeatherStatus(),
+                    Text(
+                      _location,
+                      style: TextStyle(fontSize: 20.0, fontFamily: 'Varela'),
+                    ),
                   ],
                 ),
               )
@@ -245,6 +252,22 @@ class _DigitalClockState extends State<DigitalClock> {
           ),
         ),
       ),
+    );
+  }
+
+  Container buildWidgetForWeatherStatus() {
+    final fileName = AssetWeatherMapper.getAssetForWeather(_condition);
+    if (fileName == null ||
+        (!fileName.endsWith('png') && !fileName.endsWith('flr'))) {
+      return Container(
+          child: Text(_condition.toString().split(".")[1].toUpperCase()));
+    }
+    return Container(
+      width: 60.0,
+      height: 60.0,
+      child: fileName.endsWith('flr')
+          ? FlareActor('assets/$fileName', animation: 'animate')
+          : Image.asset('assets/$fileName'),
     );
   }
 

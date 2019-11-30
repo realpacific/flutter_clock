@@ -21,6 +21,13 @@ flutter:
   uses-material-design: true
   assets:
     - assets/undraw_a_day_at_the_park.png
+    - assets/sunny.png
+    - assets/cloudy_day.png
+    - assets/snow.png
+    - assets/snowing.flr
+    - assets/snowfall.flr
+    - assets/rainfall.flr
+    - assets/thunder.flr
   fonts:
     - family: Segment7Standard
       fonts:
