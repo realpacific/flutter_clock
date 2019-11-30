@@ -67,6 +67,8 @@ class _DigitalClockState extends State<DigitalClock> {
   ClockHand secondHand = SecondClockHand(_secondController);
   var _currentHourFormat = _HourFormat.hours12;
 
+  var _weatherDisplayWidth = WEATHER_DISPLAY_WIDTH;
+
   @override
   void initState() {
     super.initState();
@@ -157,8 +159,10 @@ class _DigitalClockState extends State<DigitalClock> {
     setState(() {
       if (MediaQuery.of(context).orientation == Orientation.portrait) {
         offset = OFFSET;
+        _weatherDisplayWidth = 200;
       } else {
         offset = 4;
+        _weatherDisplayWidth = WEATHER_DISPLAY_WIDTH;
       }
     });
     return Container(
@@ -204,7 +208,7 @@ class _DigitalClockState extends State<DigitalClock> {
       clipBehavior: Clip.antiAlias,
       clipper: ArcClipper(),
       child: SizedBox(
-        width: WEATHER_DISPLAY_WIDTH,
+        width: _weatherDisplayWidth,
         child: Card(
           shape: ContinuousRectangleBorder(),
           borderOnForeground: true,
@@ -213,16 +217,7 @@ class _DigitalClockState extends State<DigitalClock> {
           margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
           child: Stack(
             children: <Widget>[
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  image: new DecorationImage(
-                    image:
-                    new AssetImage('assets/undraw_a_day_at_the_park.png'),
-                    fit: BoxFit.fitHeight,
-                  ),
-                ),
-              ),
+              buildWallpaper(),
               buildOverlay(),
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -255,6 +250,19 @@ class _DigitalClockState extends State<DigitalClock> {
     );
   }
 
+  Container buildWallpaper() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        image: new DecorationImage(
+          image: new AssetImage(
+              isDarkTheme() ? 'assets/stacked_rocks.jpg' : 'assets/boats.jpg'),
+          fit: BoxFit.fill,
+        ),
+      ),
+    );
+  }
+
   Container buildWidgetForWeatherStatus() {
     final fileName = AssetWeatherMapper.getAssetForWeather(_condition);
     if (fileName == null ||
@@ -273,7 +281,7 @@ class _DigitalClockState extends State<DigitalClock> {
 
   Container buildOverlay() {
     return Container(
-      color: isDarkTheme() ? Colors.black54 : Colors.white12,
+      color: isDarkTheme() ? Colors.black54 : Colors.transparent,
     );
   }
 
